@@ -41,6 +41,7 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
   fileWarning,
 }) => {
   const [playbackRate, setPlaybackRate] = useState<number>(1);
+  const [hasPlayerError, setHasPlayerError] = useState(false);
 
   const handleRateChange = (rate: number) => {
     setPlaybackRate(rate);
@@ -111,12 +112,25 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
             <video
               ref={videoRef}
               src={metadata.objectUrl}
-              controls
+              controls={!hasPlayerError}
               playsInline
               preload="metadata"
               onTimeUpdate={(e) => onTimeUpdate(e.currentTarget.currentTime)}
+              onError={() => setHasPlayerError(true)}
+              onLoadedData={() => setHasPlayerError(false)}
               className="w-full h-full object-contain"
             />
+            {hasPlayerError && (
+              <div className="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-4 text-center z-10">
+                <AlertTriangle className="w-8 h-8 text-amber-400 mb-2" />
+                <p className="text-xs font-semibold text-white mb-1">
+                  Browser Player Preview Unavailable
+                </p>
+                <p className="text-[11px] text-slate-400 max-w-xs">
+                  Your browser's built-in media player cannot decode this container or video codec directly, but WebAssembly splitting will process it at 100% quality below!
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Quick Playback Speed & Seek Controls */}

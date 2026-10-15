@@ -61,14 +61,10 @@ export async function extractVideoMetadata(file: File): Promise<VideoMetadata> {
       cleanup();
       URL.revokeObjectURL(objectUrl);
       reject(new Error('Video metadata loading timed out. The file may be corrupt or encoded in an unsupported format.'));
-    }, 15000);
+    }, 25000);
 
-    video.onloadedmetadata = async () => {
+    const finalizeMetadata = async (duration: number, width: number, height: number) => {
       clearTimeout(timeout);
-
-      const duration = video.duration;
-      const width = video.videoWidth;
-      const height = video.videoHeight;
 
       if (isNaN(duration) || duration <= 0) {
         cleanup();
@@ -80,7 +76,6 @@ export async function extractVideoMetadata(file: File): Promise<VideoMetadata> {
       // Check audio track presence
       let hasAudio = false;
       try {
-        // Native video audioTracks property (Chrome/Edge/Safari support check)
         const anyVideo = video as unknown as {
           webkitAudioDecodedByteCount?: number;
           audioTracks?: { length: number };
@@ -92,13 +87,12 @@ export async function extractVideoMetadata(file: File): Promise<VideoMetadata> {
         } else if (typeof anyVideo.mozHasAudio !== 'undefined') {
           hasAudio = anyVideo.mozHasAudio;
         } else if (typeof anyVideo.webkitAudioDecodedByteCount !== 'undefined') {
-          hasAudio = true; // tentative
+          hasAudio = true;
         } else {
           // Probe first chunk with AudioContext
           hasAudio = await probeAudioWithAudioContext(file);
         }
       } catch {
-        // Fallback default to true to preserve audio tracks during splitting
         hasAudio = true;
       }
 
@@ -117,6 +111,25 @@ export async function extractVideoMetadata(file: File): Promise<VideoMetadata> {
         objectUrl,
         bitrate: duration > 0 ? (file.size * 8) / duration : undefined,
       });
+    };
+
+    video.onloadedmetadata = () => {
+      const width = video.videoWidth || 1920;
+      const height = video.videoHeight || 1080;
+      let duration = video.duration;
+
+      if (duration === Infinity) {
+        video.currentTime = 1e101;
+        video.ontimeupdate = () => {
+          video.ontimeupdate = null;
+          const realDuration = isNaN(video.duration) || video.duration === Infinity ? 0 : video.duration;
+          video.currentTime = 0;
+          finalizeMetadata(realDuration, width, height);
+        };
+        return;
+      }
+
+      finalizeMetadata(duration, width, height);
     };
 
     video.onerror = () => {
@@ -145,6 +158,7 @@ export async function extractVideoMetadata(file: File): Promise<VideoMetadata> {
     };
 
     video.src = objectUrl;
+    video.load();
   });
 }
 
@@ -157,23 +171,32 @@ async function probeAudioWithAudioContext(file: File): Promise<boolean> {
     if (!AudioContextClass) return true;
 
     const ctx = new AudioContextClass();
-    // Slice first 512 KB
     const slice = file.slice(0, Math.min(file.size, 512 * 1024));
     const arrayBuffer = await slice.arrayBuffer();
 
     return new Promise<boolean>((resolve) => {
+      const timer = setTimeout(() => {
+        try { ctx.close(); } catch {}
+        resolve(true); // Fallback true safely
+      }, 1500);
+
+      const handleDone = (hasAudio: boolean) => {
+        clearTimeout(timer);
+        try { ctx.close(); } catch {}
+        resolve(hasAudio);
+      };
+
       ctx.decodeAudioData(
         arrayBuffer,
         (buffer) => {
-          ctx.close();
-          resolve(buffer.numberOfChannels > 0);
+          handleDone(buffer.numberOfChannels > 0);
         },
         () => {
-          ctx.close();
-          // Fallback true so we don't drop audio in FFmpeg
-          resolve(true);
+          handleDone(true);
         }
-      );
+      ).catch(() => {
+        handleDone(true);
+      });
     });
   } catch {
     return true;

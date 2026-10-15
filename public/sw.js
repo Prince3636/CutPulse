@@ -3,7 +3,7 @@
  * Cache-First for static assets and WebAssembly binaries. Network-first for navigation.
  */
 
-const CACHE_NAME = 'cutpulse-v1';
+const CACHE_NAME = 'cutpulse-v2';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -11,16 +11,17 @@ const PRECACHE_ASSETS = [
   '/favicon.svg',
 ];
 
-// Install: Pre-cache core shell
+// Install: Pre-cache core shell and activate immediately
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_ASSETS);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// Activate: Clean up any old version caches
+// Activate: Clean up any old version caches immediately and claim clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -35,15 +36,45 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Allow clients to force skipWaiting
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Fetch: Strategy dispatcher
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+  const reqUrl = event.request.url;
 
-  // Ignore non-GET requests and external tracking/ads
+  // 1. CRITICAL: NEVER intercept non-HTTP(S) schemes!
+  // Client Blob URLs (blob:https://...) and data: URLs are internal to the browser's
+  // renderer memory. Service Workers cannot fetch client blobs and will fail with ERR_FILE_NOT_FOUND.
+  if (!reqUrl.startsWith('http://') && !reqUrl.startsWith('https://')) {
+    return;
+  }
+
+  let url;
+  try {
+    url = new URL(reqUrl);
+  } catch {
+    return;
+  }
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return;
+  }
+
+  // 2. Ignore non-GET requests and cross-origin tracking/ads
   if (event.request.method !== 'GET') return;
   if (!url.origin.includes(self.location.origin)) return;
 
-  // 1. Navigation requests: Network-First with cached fallback
+  // 3. DO NOT intercept media range requests (video and audio tags use HTTP Range headers)
+  if (event.request.destination === 'video' || event.request.destination === 'audio') {
+    return;
+  }
+
+  // 4. Navigation requests: Network-First with cached fallback
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => {
@@ -53,7 +84,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Static Assets (/assets/, /ffmpeg/, .js, .css, .wasm): Cache-First, then network fallback
+  // 5. Static Assets (/assets/, /ffmpeg/, .js, .css, .wasm, .svg, .json): Cache-First, then network fallback
   if (
     url.pathname.startsWith('/assets/') ||
     url.pathname.startsWith('/ffmpeg/') ||
@@ -73,8 +104,8 @@ self.addEventListener('fetch', (event) => {
           if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
+              cache.put(event.request, responseClone).catch(() => {});
+            }).catch(() => {});
           }
           return networkResponse;
         });
@@ -83,7 +114,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Default: Network with Cache fallback
+  // 6. Default: Network with Cache fallback
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
