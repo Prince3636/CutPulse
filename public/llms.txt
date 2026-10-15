@@ -1,0 +1,30 @@
+# CutPulse Video Splitter
+
+> High-performance, client-side video splitter operating 100% locally in web browsers via WebAssembly. Splits videos by duration, WhatsApp status (30s), reels (90s), shorts (60s), equal parts, or custom timestamps without watermarks, without re-encoding, and without uploading files to external servers.
+
+## Core Capabilities
+- **Stream-Copy Slicing (-c copy)**: Zero quality loss demuxing. Cuts keyframe-aligned video and audio packets directly into new container segments in seconds.
+- **Accurate Cut Mode**: Frame-exact microsecond precision re-encoding with customizable CRF quality profiles (high, balanced, fast).
+- **Social Media Presets**:
+  - WhatsApp Status (30s continuous sequential clips)
+  - YouTube Shorts & TikTok (60s)
+  - Instagram Reels (90s)
+  - Stories & Snapchat (15s)
+  - Extended TikTok (180s)
+- **Equal Divisions**: Slices any video into N equal parts (2 halves, 3 parts, 5 parts, etc.) with exact mathematical distribution.
+- **Custom Chapters & Timestamps**: Parses flexible time formats (e.g. `0:30, 1:15, 2:45` or `45s, 2m`).
+- **Batch Export**: Downloads all clips in a single structured ZIP archive with a text manifest, or downloads sequentially to prevent browser popup blocks.
+- **Audio Control**: Option to preserve original audio fidelity or strip audio entirely (Mute mode).
+- **Interactive Timeline**: Real-time visual timeline map with clickable playhead scrub, segment previews, and individual segment inclusion/exclusion toggles.
+
+## Privacy & Security Guarantees
+- **Zero Server Upload**: 0 bytes of video data are transferred over the network.
+- **Client-Side Sandbox**: Uses FFmpeg WebAssembly inside the browser's isolated JavaScript memory.
+- **No Account Required**: Free, instant, zero signup, no cookies, zero watermarks.
+- **Supported Formats**: MP4 (H.264 / H.265), WebM (VP8 / VP9), MOV (QuickTime), MKV (Matroska).
+- **Recommended File Limits**: Up to 2 GB on desktop browsers, up to 500 MB on mobile devices.
+
+## Website & Canonical Resource
+- Official Web Application: https://cutpulse.com
+- Documentation & FAQ: https://cutpulse.com/#faq
+- Privacy Policy: https://cutpulse.com/#privacy

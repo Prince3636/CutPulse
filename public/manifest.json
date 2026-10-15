@@ -1,0 +1,19 @@
+{
+  "short_name": "CutPulse",
+  "name": "CutPulse Video Splitter",
+  "description": "High-performance browser-based video splitter. Split videos by duration or equal parts locally with stream-copy original quality, zero watermark, and ZIP export.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "display": "standalone",
+  "orientation": "any",
+  "categories": ["utilities", "video", "multimedia"]
+}
