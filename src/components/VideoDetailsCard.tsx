@@ -18,7 +18,6 @@ import {
   Film,
   FastForward,
   RotateCcw,
-  Sparkles,
 } from 'lucide-react';
 
 interface VideoDetailsCardProps {
@@ -257,7 +256,7 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
             </div>
           )}
 
-          <div className="p-3.5 rounded-xl bg-slate-950/40 border border-slate-800/60 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
             <span className="text-slate-300">
               Format: <strong className="text-white font-mono">{metadata.type || 'video/mp4'}</strong>
             </span>
@@ -269,11 +268,6 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
               <span className="text-slate-600">·</span>
               <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300 text-[10px]">Ctrl+↵</kbd> Split
             </div>
-
-            <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>WebAssembly Ready · Zero Upload</span>
-            </span>
           </div>
         </div>
       </div>

@@ -102,19 +102,14 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
   return (
     <div className="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-8 shadow-xl">
       {/* Header with Title and Mode Tabs */}
-      <div>
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-indigo-400" />
-            <span>Configure Video Splitting</span>
-          </h3>
-          <span className="text-xs text-slate-400">
-            Source Length: <strong className="font-mono text-slate-200">{formatDuration(videoDuration)}</strong>
-          </span>
-        </div>
-        <p className="text-xs text-slate-400">
-          Choose a social preset, uniform interval, equal division, or custom chapter timestamps.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-indigo-400" />
+          <span>Split Mode</span>
+        </h3>
+        <span className="text-xs text-slate-400 font-mono">
+          Duration: <strong className="text-slate-200">{formatDuration(videoDuration)}</strong>
+        </span>
       </div>
 
       {/* Category Navigation Tabs */}
@@ -186,22 +181,19 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
                     key={mode.id}
                     type="button"
                     onClick={() => onUpdateSettings({ mode: mode.id })}
-                    className={`p-3.5 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all ${
                       isSelected
                         ? style.selectedCard
                         : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700 hover:bg-slate-900/80'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm font-bold tracking-tight">{mode.label}</span>
-                      {mode.badge && (
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded border font-mono font-medium flex items-center gap-1 ${style.badgeClass}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${style.dotClass}`} />
-                          <span>{mode.badge}</span>
-                        </span>
-                      )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs sm:text-sm font-bold tracking-tight">{mode.badge || mode.label}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded border font-mono font-bold flex items-center gap-1 ${style.badgeClass}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${style.dotClass}`} />
+                        <span>{mode.label.split(' ')[0]}</span>
+                      </span>
                     </div>
-                    <div className="text-[11px] text-slate-400 line-clamp-1">{mode.description}</div>
                   </button>
                 );
               })}
@@ -220,14 +212,13 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
                     key={mode.id}
                     type="button"
                     onClick={() => onUpdateSettings({ mode: mode.id })}
-                    className={`p-4 rounded-xl border text-left transition-all ${
+                    className={`p-3.5 rounded-xl border text-center transition-all ${
                       isSelected
                         ? 'border-indigo-500 bg-indigo-600/20 text-white ring-1 ring-indigo-500 shadow-sm'
                         : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700 hover:bg-slate-900/80'
                     }`}
                   >
-                    <div className="text-sm font-bold mb-1">{mode.label}</div>
-                    <div className="text-xs text-slate-400">{mode.description}</div>
+                    <div className="text-sm font-bold">{mode.label}</div>
                   </button>
                 );
               })}
@@ -247,9 +238,9 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
                   : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700 hover:bg-slate-900/80'
               }`}
             >
-              <div className="text-sm font-bold mb-1">Two Equal Halves (50% / 50%)</div>
+              <div className="text-sm font-bold mb-1">2 Equal Halves</div>
               <div className="text-xs text-slate-400">
-                Divides exactly into 2 parts of <strong className="text-slate-200">{formatDuration(videoDuration / 2)}</strong> each
+                2 clips of <strong className="text-slate-200">{formatDuration(videoDuration / 2)}</strong> each
               </div>
             </button>
 
@@ -262,7 +253,7 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold">Split into N Equal Parts</span>
+                <span className="text-sm font-bold">N Equal Parts</span>
                 <span className="text-xs text-slate-400 font-mono">
                   ~{formatDuration(videoDuration / (settings.equalParts || 2))} per clip
                 </span>
@@ -297,8 +288,8 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
                   : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700 hover:bg-slate-900/80'
               }`}
             >
-              <div className="text-sm font-bold mb-1">Fixed Custom Interval</div>
-              <p className="text-xs text-slate-400 mb-3">Split every X seconds or minutes uniformly.</p>
+              <div className="text-sm font-bold mb-1">Fixed Interval</div>
+              <p className="text-xs text-slate-400 mb-3">Split every X seconds or minutes.</p>
 
               <div className="flex flex-wrap items-center gap-2" onClick={(e) => e.stopPropagation()}>
                 <input
@@ -344,9 +335,9 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
                   : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700 hover:bg-slate-900/80'
               }`}
             >
-              <div className="text-sm font-bold mb-1">Custom Split Timestamps / Cue Points</div>
+              <div className="text-sm font-bold mb-1">Custom Timestamps</div>
               <p className="text-xs text-slate-400 mb-2">
-                Enter comma or newline separated timestamps (e.g. <code>0:30, 1:15, 2:40</code>).
+                e.g. <code>0:30, 1:15, 2:40</code> (comma separated)
               </p>
 
               <div onClick={(e) => e.stopPropagation()}>
@@ -372,7 +363,7 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
         >
           <div className="flex items-center gap-2">
             <Settings2 className="w-4 h-4 text-indigo-400" />
-            <span>Output Audio, Quality & Custom Naming Options</span>
+            <span>Advanced Settings</span>
           </div>
           {showAdvancedSettings ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
         </button>
@@ -490,12 +481,12 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
           <div className="flex items-center gap-2">
             <CheckSquare className="w-4 h-4 text-indigo-400" />
             <span>
-              Inspect & Filter Upcoming Clips ({selectedCount} of {calculation.totalClips} selected)
+              Review Clips ({selectedCount} of {calculation.totalClips})
             </span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-slate-400">
-              Total Duration: <strong className="font-mono text-slate-200">{formatDuration(selectedTotalDuration)}</strong>
+              Duration: <strong className="font-mono text-slate-200">{formatDuration(selectedTotalDuration)}</strong>
             </span>
             {showSegmentTable ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
           </div>
@@ -505,7 +496,7 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
           <div className="p-4 border-t border-slate-800 space-y-3">
             <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800/80">
               <span className="text-slate-400">
-                Uncheck any unwanted clip (e.g. short outro or silent section) to exclude it before splitting.
+                Click clips to include or exclude:
               </span>
               <div className="flex items-center gap-2 shrink-0">
                 <button

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { UploadCloud, Video, AlertCircle, Sparkles, Loader2, ShieldCheck, Zap, FileVideo } from 'lucide-react';
+import { UploadCloud, AlertCircle, Sparkles, Loader2 } from 'lucide-react';
 import { generateSampleVideo } from '../utils/sampleVideoGenerator';
 
 interface UploadDropzoneProps {
@@ -88,7 +88,7 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => !isLoadingMetadata && !isGeneratingDemo && fileInputRef.current?.click()}
-        className={`relative w-full rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer overflow-hidden p-6 sm:p-12 text-center flex flex-col items-center justify-center min-h-[300px] sm:min-h-[340px] ${
+        className={`relative w-full rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer overflow-hidden p-6 sm:p-10 text-center flex flex-col items-center justify-center min-h-[220px] sm:min-h-[250px] ${
           isDragOver
             ? 'border-indigo-400 bg-indigo-500/15 scale-[1.008] shadow-2xl shadow-indigo-500/20'
             : 'border-slate-800 bg-slate-900/50 hover:border-slate-700 hover:bg-slate-900/80 shadow-xl'
@@ -103,69 +103,35 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
         />
 
         {isLoadingMetadata || isGeneratingDemo ? (
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-12 h-12 text-indigo-400 animate-spin" />
-            <p className="text-base font-semibold text-white">
-              {isGeneratingDemo
-                ? 'Synthesizing 45-second test video (30 FPS, audio tone)...'
-                : 'Analyzing video container & keyframe indices...'}
-            </p>
-            <p className="text-xs text-slate-400 max-w-sm">
-              Verifying stream parameters and audio tracks locally in browser memory. No data is sent over the network.
+          <div className="flex flex-col items-center gap-2.5">
+            <Loader2 className="w-9 h-9 text-indigo-400 animate-spin" />
+            <p className="text-sm font-semibold text-white">
+              {isGeneratingDemo ? 'Preparing sample video...' : 'Reading video in browser memory...'}
             </p>
           </div>
         ) : (
           <>
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-900/80 to-indigo-600/30 border border-indigo-500/40 text-indigo-400 flex items-center justify-center mb-5 shadow-inner">
-              <UploadCloud className="w-8 h-8 text-indigo-300" />
+            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mb-3.5">
+              <UploadCloud className="w-7 h-7 text-indigo-300" />
             </div>
 
-            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">
-              Drag & drop video here, or <span className="text-indigo-400 underline underline-offset-4 decoration-indigo-400/60 hover:text-indigo-300">browse files</span>
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-1 tracking-tight">
+              Choose a video file
             </h3>
 
-            <p className="text-xs sm:text-sm text-slate-400 max-w-lg mb-5 leading-relaxed px-2">
-              Select or drop any video file<span className="hidden sm:inline"> (or press <kbd className="px-1.5 py-0.5 text-xs bg-slate-800 text-slate-300 rounded border border-slate-700 font-mono">Ctrl+V</kbd> to paste)</span>. Slices at raw stream speed with zero quality loss.
+            <p className="text-xs sm:text-sm text-slate-400 mb-4 max-w-md">
+              Drag & drop here, or <span className="text-indigo-400 font-semibold underline underline-offset-4 hover:text-indigo-300">browse</span> · MP4, WebM, MOV, MKV up to 2 GB
             </p>
 
-            {/* Supported Containers Tags */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
-              {['MP4 (H.264 / H.265)', 'WebM (VP8 / VP9)', 'MOV (QuickTime)', 'MKV (Matroska)'].map((fmt) => (
-                <span
-                  key={fmt}
-                  className="px-2.5 py-1 text-[11px] font-medium text-slate-300 bg-slate-950/80 border border-slate-800 rounded-lg flex items-center gap-1.5"
-                >
-                  <FileVideo className="w-3 h-3 text-indigo-400" />
-                  <span>{fmt}</span>
-                </span>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 mb-6">
-              <span className="flex items-center gap-1 text-emerald-400">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>100% Client-Side Privacy</span>
-              </span>
-              <span aria-hidden="true">·</span>
-              <span className="flex items-center gap-1 text-sky-400">
-                <Zap className="w-3.5 h-3.5" />
-                <span>Original Bitstream Quality</span>
-              </span>
-              <span aria-hidden="true">·</span>
-              <span className="text-slate-300 font-medium">Zero Watermark</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={handleGenerateSample}
-                disabled={isGeneratingDemo}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-indigo-200 bg-indigo-950/90 hover:bg-indigo-900 border border-indigo-700/60 rounded-xl transition-all shadow-sm active:scale-95"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Try Sample Demo Video (45s)</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleGenerateSample}
+              disabled={isGeneratingDemo}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-300 bg-indigo-950/60 hover:bg-indigo-900/80 border border-indigo-800/60 rounded-lg transition-all active:scale-95"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Try Sample Video (45s)</span>
+            </button>
           </>
         )}
       </div>

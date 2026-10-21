@@ -28,7 +28,7 @@ import { ShareModal } from './components/ShareModal';
 import { AdBanner } from './components/AdBanner';
 import { formatDuration } from './utils/formatters';
 import { notifyCompletion } from './utils/audioNotification';
-import { Zap, Scissors } from 'lucide-react';
+import { Scissors } from 'lucide-react';
 
 export default function App() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -432,37 +432,17 @@ export default function App() {
       }`}>
         {/* Hero Introduction */}
         {!metadata && (
-          <section className="text-center max-w-3xl mx-auto space-y-4 pt-4 sm:pt-8">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-950/70 border border-indigo-700/50 text-xs font-semibold text-indigo-300 shadow-inner">
-              <Zap className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Stream-Copy Engine · No Quality Loss · Zero Watermark</span>
-            </div>
-
+          <section className="text-center max-w-2xl mx-auto space-y-3 pt-4 sm:pt-8">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] text-balance">
-              Split Videos Online in Seconds{' '}
+              Split Videos Fast.{' '}
               <span className="bg-gradient-to-r from-indigo-400 via-sky-300 to-purple-400 bg-clip-text text-transparent">
-                Right in Your Browser
+                Right in Your Browser.
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base lg:text-lg text-slate-300/90 leading-relaxed max-w-2xl mx-auto text-balance font-normal">
-              Slice long videos for WhatsApp Status (30s), Instagram Reels, YouTube Shorts, or custom chapters without uploading a single byte to external servers.
+            <p className="text-sm sm:text-base text-slate-400 max-w-lg mx-auto text-balance">
+              Cut long videos into WhatsApp, Reels & Shorts clips. Lossless quality, zero uploads, zero watermarks.
             </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs font-medium text-slate-400">
-              <span className="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300">
-                🔒 100% In-Browser Privacy
-              </span>
-              <span className="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300">
-                ⚡ No Re-Encoding Speed
-              </span>
-              <span className="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300">
-                📦 Batch ZIP Export
-              </span>
-              <span className="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300">
-                📴 100% Offline PWA
-              </span>
-            </div>
           </section>
         )}
 
