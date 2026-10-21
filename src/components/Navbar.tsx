@@ -134,25 +134,25 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
             <button
               onClick={() => handleMobileNavClick(() => onScrollToSection('split-workspace'))}
-              className="min-h-[44px] p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-left text-slate-300 hover:text-white active:bg-slate-850 flex items-center transition-colors"
+              className="min-h-[44px] p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-left text-slate-300 hover:text-white active:bg-slate-800 flex items-center transition-colors"
             >
               Splitter Studio
             </button>
             <button
               onClick={() => handleMobileNavClick(() => onScrollToSection('splitting-modes'))}
-              className="min-h-[44px] p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-left text-slate-300 hover:text-white active:bg-slate-850 flex items-center transition-colors"
+              className="min-h-[44px] p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-left text-slate-300 hover:text-white active:bg-slate-800 flex items-center transition-colors"
             >
               Social Presets
             </button>
             <button
               onClick={() => handleMobileNavClick(() => onScrollToSection('privacy-security'))}
-              className="min-h-[44px] p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-left text-slate-300 hover:text-white active:bg-slate-850 flex items-center transition-colors"
+              className="min-h-[44px] p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-left text-slate-300 hover:text-white active:bg-slate-800 flex items-center transition-colors"
             >
               Local Privacy
             </button>
             <button
               onClick={() => handleMobileNavClick(() => onScrollToSection('faq-section'))}
-              className="min-h-[44px] p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-left text-slate-300 hover:text-white active:bg-slate-850 flex items-center transition-colors"
+              className="min-h-[44px] p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-left text-slate-300 hover:text-white active:bg-slate-800 flex items-center transition-colors"
             >
               FAQ
             </button>

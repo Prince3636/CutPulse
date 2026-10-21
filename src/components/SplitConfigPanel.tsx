@@ -429,7 +429,7 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
             </div>
 
             {/* 2. Audio Track Toggle */}
-            <div className="pt-3 border-t border-slate-850 flex flex-wrap items-center justify-between gap-4">
+            <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4">
               <div>
                 <span className="font-semibold text-slate-200 block mb-0.5">Audio Track Output</span>
                 <span className="text-slate-400 text-[11px]">
@@ -463,7 +463,7 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
             </div>
 
             {/* 3. Custom Output Filename Prefix */}
-            <div className="pt-3 border-t border-slate-850 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+            <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
               <div>
                 <span className="font-semibold text-slate-200 block mb-0.5">Custom Filename Prefix</span>
                 <span className="text-slate-400 text-[11px]">Leave empty to default to original video filename.</span>
@@ -503,7 +503,7 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
 
         {showSegmentTable && (
           <div className="p-4 border-t border-slate-800 space-y-3">
-            <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-850">
+            <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800/80">
               <span className="text-slate-400">
                 Uncheck any unwanted clip (e.g. short outro or silent section) to exclude it before splitting.
               </span>
@@ -525,7 +525,7 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
               </div>
             </div>
 
-            <div className="max-h-60 overflow-y-auto divide-y divide-slate-850/60 pr-1">
+            <div className="max-h-60 overflow-y-auto divide-y divide-slate-800/60 pr-1">
               {calculation.segments.map((seg) => {
                 const isSelected = seg.selected !== false;
                 return (

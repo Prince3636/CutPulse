@@ -361,7 +361,7 @@ export const ClipResultsList: React.FC<ClipResultsListProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-850 flex items-center justify-between gap-2">
+                <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
                   <span className="text-[11px] text-emerald-400/90 font-medium flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
                     <span>Original Quality</span>
