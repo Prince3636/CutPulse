@@ -124,8 +124,8 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
               Drag & drop video here, or <span className="text-indigo-400 underline underline-offset-4 decoration-indigo-400/60 hover:text-indigo-300">browse files</span>
             </h3>
 
-            <p className="text-sm text-slate-400 max-w-lg mb-5 leading-relaxed">
-              Drop any video or press <kbd className="px-1.5 py-0.5 text-xs bg-slate-800 text-slate-300 rounded border border-slate-700 font-mono">Ctrl+V</kbd> to paste from clipboard. Slices at raw stream speed with zero quality loss.
+            <p className="text-xs sm:text-sm text-slate-400 max-w-lg mb-5 leading-relaxed px-2">
+              Select or drop any video file<span className="hidden sm:inline"> (or press <kbd className="px-1.5 py-0.5 text-xs bg-slate-800 text-slate-300 rounded border border-slate-700 font-mono">Ctrl+V</kbd> to paste)</span>. Slices at raw stream speed with zero quality loss.
             </p>
 
             {/* Supported Containers Tags */}

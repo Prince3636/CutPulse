@@ -19,6 +19,8 @@ export const TimelineVisualizer: React.FC<TimelineVisualizerProps> = ({
   onToggleSegment,
 }) => {
   const [hoveredSegmentIndex, setHoveredSegmentIndex] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [scrubTooltip, setScrubTooltip] = useState<{ x: number; time: number } | null>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
   if (!calculation.isValid || calculation.segments.length === 0) {
@@ -28,16 +30,60 @@ export const TimelineVisualizer: React.FC<TimelineVisualizerProps> = ({
   const hoveredSegment = hoveredSegmentIndex !== null ? calculation.segments[hoveredSegmentIndex] : null;
   const playheadPercent = Math.max(0, Math.min(100, (currentPlayheadTime / videoDuration) * 100));
 
-  const handleBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const seekFromClientX = (clientX: number) => {
     if (!barRef.current || !onSeek) return;
     const rect = barRef.current.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
+    const clickX = clientX - rect.left;
     const fraction = Math.max(0, Math.min(1, clickX / rect.width));
     const targetTime = fraction * videoDuration;
     onSeek(targetTime);
+    setScrubTooltip({ x: fraction * 100, time: targetTime });
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    seekFromClientX(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isDragging) {
+      seekFromClientX(e.clientX);
+    } else if (barRef.current) {
+      const rect = barRef.current.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const fraction = Math.max(0, Math.min(1, clickX / rect.width));
+      setScrubTooltip({ x: fraction * 100, time: fraction * videoDuration });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+    setScrubTooltip(null);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length > 0) {
+      seekFromClientX(e.touches[0].clientX);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length > 0) {
+      seekFromClientX(e.touches[0].clientX);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setScrubTooltip(null);
   };
 
   const selectedCount = calculation.segments.filter((s) => s.selected !== false).length;
+  const segCount = calculation.segments.length;
+  const gapClass = segCount > 24 ? 'gap-px p-0.5' : segCount > 12 ? 'gap-0.5 p-1' : 'gap-1 p-1';
 
   return (
     <div className="w-full bg-slate-900/60 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-lg">
@@ -56,57 +102,75 @@ export const TimelineVisualizer: React.FC<TimelineVisualizerProps> = ({
         </div>
       </div>
 
-      {/* Segment Bar Container with Playhead */}
-      <div
-        ref={barRef}
-        onClick={handleBarClick}
-        className="relative w-full h-11 sm:h-10 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex p-1 gap-1 cursor-pointer select-none group touch-manipulation"
-      >
-        {calculation.segments.map((seg, idx) => {
-          const widthPercent = (seg.duration / videoDuration) * 100;
-          const isHovered = hoveredSegmentIndex === idx;
-          const isSelected = seg.selected !== false;
+      {/* Segment Bar Container with Playhead and Touch Support */}
+      <div className="relative">
+        {/* Floating scrub time tooltip */}
+        {scrubTooltip && (
+          <div
+            style={{ left: `${scrubTooltip.x}%` }}
+            className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-white text-[10px] font-mono shadow-md z-30 pointer-events-none whitespace-nowrap"
+          >
+            {formatDuration(scrubTooltip.time, true)}
+          </div>
+        )}
 
-          let bgClass = '';
-          if (!isSelected) {
-            bgClass = 'bg-slate-800/50 text-slate-500 line-through opacity-40 hover:opacity-70';
-          } else if (seg.isPartial) {
-            bgClass = isHovered ? 'bg-amber-400 text-amber-950' : 'bg-amber-500/85 text-amber-950';
-          } else if (isHovered) {
-            bgClass = 'bg-indigo-400 text-indigo-950';
-          } else {
-            bgClass = idx % 2 === 0 ? 'bg-indigo-600/90 text-white' : 'bg-indigo-700/80 text-white';
-          }
-
-          return (
-            <div
-              key={seg.index}
-              onMouseEnter={() => setHoveredSegmentIndex(idx)}
-              onMouseLeave={() => setHoveredSegmentIndex(null)}
-              onClick={(e) => {
-                e.stopPropagation();
-                setHoveredSegmentIndex(idx);
-                onSeek?.(seg.startTime);
-              }}
-              style={{ width: `${widthPercent}%` }}
-              className={`h-full ${bgClass} rounded-md transition-all cursor-pointer relative flex items-center justify-center overflow-hidden border border-white/5 hover:border-white/20`}
-              title={`Clip ${seg.index}: ${formatDuration(seg.startTime)} - ${formatDuration(seg.endTime)} (${formatDuration(seg.duration, true)}) — Click to jump`}
-            >
-              {widthPercent > 5 && (
-                <span className="text-[10px] font-bold select-none truncate px-1">
-                  #{seg.index}
-                </span>
-              )}
-            </div>
-          );
-        })}
-
-        {/* Live Playhead Indicator */}
         <div
-          style={{ left: `${playheadPercent}%` }}
-          className="absolute top-0 bottom-0 w-0.5 bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.9)] pointer-events-none transition-all duration-75 z-20"
+          ref={barRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className={`relative w-full h-11 sm:h-10 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex ${gapClass} cursor-pointer select-none group touch-manipulation`}
         >
-          <div className="w-2.5 h-2.5 bg-rose-500 -ml-1 rounded-full shadow-sm -mt-0.5" />
+          {calculation.segments.map((seg, idx) => {
+            const widthPercent = (seg.duration / videoDuration) * 100;
+            const isHovered = hoveredSegmentIndex === idx;
+            const isSelected = seg.selected !== false;
+
+            let bgClass = '';
+            if (!isSelected) {
+              bgClass = 'bg-slate-800/50 text-slate-500 line-through opacity-40 hover:opacity-70';
+            } else if (seg.isPartial) {
+              bgClass = isHovered ? 'bg-amber-400 text-amber-950' : 'bg-amber-500/85 text-amber-950';
+            } else if (isHovered) {
+              bgClass = 'bg-indigo-400 text-indigo-950';
+            } else {
+              bgClass = idx % 2 === 0 ? 'bg-indigo-600/90 text-white' : 'bg-indigo-700/80 text-white';
+            }
+
+            return (
+              <div
+                key={seg.index}
+                onMouseEnter={() => setHoveredSegmentIndex(idx)}
+                onMouseLeave={() => setHoveredSegmentIndex(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setHoveredSegmentIndex(idx);
+                  onSeek?.(seg.startTime);
+                }}
+                style={{ width: `${widthPercent}%` }}
+                className={`h-full ${bgClass} rounded-md transition-all cursor-pointer relative flex items-center justify-center overflow-hidden border border-white/5 hover:border-white/20`}
+                title={`Clip ${seg.index}: ${formatDuration(seg.startTime)} - ${formatDuration(seg.endTime)} (${formatDuration(seg.duration, true)})`}
+              >
+                {widthPercent > 5 && (
+                  <span className="text-[10px] font-bold select-none truncate px-0.5">
+                    #{seg.index}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Live Playhead Indicator */}
+          <div
+            style={{ left: `${playheadPercent}%` }}
+            className="absolute top-0 bottom-0 w-0.5 bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.9)] pointer-events-none transition-all duration-75 z-20"
+          >
+            <div className="w-2.5 h-2.5 bg-rose-500 -ml-1 rounded-full shadow-sm -mt-0.5" />
+          </div>
         </div>
       </div>
 

@@ -57,6 +57,7 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
     }
   };
 
+  const isVertical = metadata.height > metadata.width;
   const resCategory = getResolutionCategory(metadata.width, metadata.height);
   const bitrateStr = formatBitrate(metadata.size, metadata.duration);
 
@@ -79,7 +80,7 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
               <span aria-hidden="true" className="text-slate-600">·</span>
               <span className="text-indigo-300 font-medium">{resCategory}</span>
               <span aria-hidden="true" className="text-slate-600">·</span>
-              <span>{metadata.aspectRatio}</span>
+              <span className={isVertical ? 'text-amber-300 font-medium' : ''}>{metadata.aspectRatio}</span>
             </div>
           </div>
         </div>
@@ -108,7 +109,11 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
       <div className="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
         {/* Video Player Container */}
         <div className="lg:col-span-5 flex flex-col gap-2">
-          <div className="bg-black rounded-xl overflow-hidden border border-slate-800 aspect-video relative flex items-center justify-center group shadow-md">
+          <div
+            className={`bg-black rounded-xl overflow-hidden border border-slate-800 relative flex items-center justify-center group shadow-md mx-auto w-full ${
+              isVertical ? 'aspect-[9/16] max-h-[460px]' : 'aspect-video max-h-[380px]'
+            }`}
+          >
             <video
               ref={videoRef}
               src={metadata.objectUrl}
@@ -118,7 +123,16 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
               onTimeUpdate={(e) => onTimeUpdate(e.currentTarget.currentTime)}
               onError={() => setHasPlayerError(true)}
               onLoadedData={() => setHasPlayerError(false)}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain cursor-pointer"
+              onClick={() => {
+                if (videoRef.current) {
+                  if (videoRef.current.paused) {
+                    videoRef.current.play().catch(() => {});
+                  } else {
+                    videoRef.current.pause();
+                  }
+                }
+              }}
             />
             {hasPlayerError && (
               <div className="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-4 text-center z-10">
@@ -135,7 +149,7 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
 
           {/* Quick Playback Speed & Seek Controls */}
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 px-1 pt-1">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => handleSeekOffset(-5)}
@@ -156,8 +170,8 @@ export const VideoDetailsCard: React.FC<VideoDetailsCardProps> = ({
               </button>
             </div>
 
-            <div className="flex items-center gap-1">
-              <span className="text-[11px] text-slate-500 mr-0.5">Speed:</span>
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
+              <span className="text-[11px] text-slate-500 mr-0.5 hidden xs:inline">Speed:</span>
               {[0.75, 1, 1.25, 1.5, 2].map((rate) => (
                 <button
                   key={rate}

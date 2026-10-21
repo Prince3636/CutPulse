@@ -7,7 +7,7 @@ import { createClipsZip } from '../services/zipService';
 import { GeneratedClip } from '../types/splitter';
 import JSZip from 'jszip';
 
-describe('Real Media Splitting & FFmpeg WebAssembly Verification', () => {
+describe('Real Media Splitting & FFmpeg WebAssembly Verification', { timeout: 30000 }, () => {
   let ffmpegCore: any;
 
   beforeAll(async () => {

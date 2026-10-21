@@ -23,6 +23,7 @@ import {
   Clock,
   Layers,
   Settings2,
+  Scissors,
 } from 'lucide-react';
 
 interface SplitConfigPanelProps {
@@ -52,6 +53,47 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
 
   const socialPresets = SPLIT_MODE_OPTIONS.filter((o) => o.category === 'social');
   const standardPresets = SPLIT_MODE_OPTIONS.filter((o) => o.category === 'preset');
+
+  const getSocialStyle = (id: string, isSelected: boolean) => {
+    switch (id) {
+      case '30s': // WhatsApp
+        return {
+          badgeClass: 'bg-emerald-950/80 text-emerald-300 border-emerald-800/60',
+          dotClass: 'bg-emerald-400',
+          selectedCard: 'border-emerald-500 bg-emerald-950/30 text-white ring-1 ring-emerald-500 shadow-sm shadow-emerald-500/10',
+        };
+      case '60s': // Shorts
+        return {
+          badgeClass: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
+          dotClass: 'bg-rose-400',
+          selectedCard: 'border-rose-500 bg-rose-950/30 text-white ring-1 ring-rose-500 shadow-sm shadow-rose-500/10',
+        };
+      case '90s': // Reels
+        return {
+          badgeClass: 'bg-fuchsia-950/80 text-fuchsia-300 border-fuchsia-800/60',
+          dotClass: 'bg-fuchsia-400',
+          selectedCard: 'border-fuchsia-500 bg-fuchsia-950/30 text-white ring-1 ring-fuchsia-500 shadow-sm shadow-fuchsia-500/10',
+        };
+      case '15s': // Stories
+        return {
+          badgeClass: 'bg-amber-950/80 text-amber-300 border-amber-800/60',
+          dotClass: 'bg-amber-400',
+          selectedCard: 'border-amber-500 bg-amber-950/30 text-white ring-1 ring-amber-500 shadow-sm shadow-amber-500/10',
+        };
+      case '180s': // TikTok
+        return {
+          badgeClass: 'bg-cyan-950/80 text-cyan-300 border-cyan-800/60',
+          dotClass: 'bg-cyan-400',
+          selectedCard: 'border-cyan-500 bg-cyan-950/30 text-white ring-1 ring-cyan-500 shadow-sm shadow-cyan-500/10',
+        };
+      default:
+        return {
+          badgeClass: 'bg-indigo-950 text-indigo-300 border-indigo-800/40',
+          dotClass: 'bg-indigo-400',
+          selectedCard: 'border-indigo-500 bg-indigo-600/20 text-white ring-1 ring-indigo-500 shadow-sm',
+        };
+    }
+  };
 
   const selectedSegments = calculation.segments.filter((s) => s.selected !== false);
   const selectedCount = selectedSegments.length;
@@ -138,6 +180,7 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {socialPresets.map((mode) => {
                 const isSelected = settings.mode === mode.id;
+                const style = getSocialStyle(mode.id, isSelected);
                 return (
                   <button
                     key={mode.id}
@@ -145,15 +188,16 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
                     onClick={() => onUpdateSettings({ mode: mode.id })}
                     className={`p-3.5 rounded-xl border text-left transition-all ${
                       isSelected
-                        ? 'border-indigo-500 bg-indigo-600/20 text-white ring-1 ring-indigo-500 shadow-sm'
+                        ? style.selectedCard
                         : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700 hover:bg-slate-900/80'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-bold">{mode.label}</span>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm font-bold tracking-tight">{mode.label}</span>
                       {mode.badge && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800/40 font-mono">
-                          {mode.badge}
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded border font-mono font-medium flex items-center gap-1 ${style.badgeClass}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${style.dotClass}`} />
+                          <span>{mode.badge}</span>
                         </span>
                       )}
                     </div>
@@ -578,9 +622,10 @@ export const SplitConfigPanel: React.FC<SplitConfigPanelProps> = ({
           type="button"
           onClick={onStartSplit}
           disabled={isProcessing || !calculation.isValid || selectedCount === 0}
-          className="w-full sm:w-auto min-h-[48px] px-8 py-3.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-indigo-600/25 transition-all active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2"
+          className="w-full xl:w-auto min-h-[48px] px-8 py-3.5 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-indigo-600/25 transition-all active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-2.5"
         >
-          {isProcessing ? 'Processing Video...' : `Split Into ${selectedCount} Clips`}
+          <Scissors className="w-4 h-4" />
+          <span>{isProcessing ? 'Processing Video...' : `Split Into ${selectedCount} Clips`}</span>
         </button>
       </div>
 
